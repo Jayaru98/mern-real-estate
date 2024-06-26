@@ -1,3 +1,5 @@
 export const test = (req, res) => {
-    res.json({message: "API is working properly!"});
-}  
+  res.json ({
+    message: "User Controller works!"
+  });
+};
