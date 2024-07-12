@@ -11,8 +11,12 @@ import {
   updateUserStart,
   updateUserSuccess,
   updateUserFail,
+  deleteUserFail,
+  deleteUserStart,
+  deleteUserSuccess,
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
+
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -85,16 +89,34 @@ export default function Profile() {
       dispatch(updateUserFail(error.message));
     }
   };
+  const handleDeleteUser = async () => {
+  try {
+    dispatch(deleteUserStart());
+    const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    if (data.success === false) {
+      dispatch(deleteUserFail(data.message));
+      return;
+    }
+    dispatch(deleteUserSuccess(data));
+  } catch (error) {
+    dispatch(deleteUserFail(error.message));
+  }
+  }
 
   return (
-    <div className="p-3 max-w-lg mx-auto">
-      <h1
+    <div className="p-3 max-w-lg mx-auto"  
+
+    >
+            <h1
         className="text-3xl font-semibold text-center
        my-7"
       >
         Profile
       </h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4" >
         <input
           onChange={(e) => setFile(e.target.files[0])}
           type="file"
@@ -155,11 +177,11 @@ export default function Profile() {
         </button>
       </form>
       <div className="flex justify-between mt-5">
-        <span
+        <span onClick={handleDeleteUser}
           className="text-red-700 
         cursor-pointer"
         >
-          Delete account{" "}
+          Delete account
         </span>
         <span
           className="text-red-700 
@@ -168,7 +190,7 @@ export default function Profile() {
           Sign Out{" "}
         </span>
       </div>
-      <p className='text-red-700 mt-5'> {error ? error:''} </p>
+      
       <p className='text-green-700'>{updateSuccess ? 'User is updated successfully!' : ''} </p>
     </div>
   );
