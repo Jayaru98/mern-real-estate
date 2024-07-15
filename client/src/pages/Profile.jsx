@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
 import { useRef, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   getDownloadURL,
   getStorage,
@@ -18,7 +19,6 @@ import {
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 
-
 export default function Profile() {
   const fileRef = useRef(null);
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -26,7 +26,7 @@ export default function Profile() {
   const [fileperc, setFileperc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
-  const[updateSuccess, setUpdateSuccess] = useState(false);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -60,7 +60,6 @@ export default function Profile() {
   };
 
   const handleChange = (e) => {
-  
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
@@ -76,8 +75,6 @@ export default function Profile() {
         body: JSON.stringify(formData),
       });
 
-      
-
       const data = await res.json();
       if (data.success === false) {
         dispatch(updateUserFail(data.message));
@@ -91,28 +88,27 @@ export default function Profile() {
     }
   };
   const handleDeleteUser = async () => {
-  try {
-    dispatch(deleteUserStart());
-    const res = await fetch(`/api/user/delete/${currentUser._id}`, {
-      method: "DELETE",
-    });
-    const data = await res.json();
-    if (data.success === false) {
-      dispatch(deleteUserFail(data.message));
-      return;
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFail(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+    } catch (error) {
+      dispatch(deleteUserFail(error.message));
     }
-    dispatch(deleteUserSuccess(data));
-  } catch (error) {
-    dispatch(deleteUserFail(error.message));
-  }
-  }
-  const handleSignOut = async() => {
-
+  };
+  const handleSignOut = async () => {
     try {
       dispatch(signOutUserStart());
-      const res = await fetch('/api/auth/signout');
+      const res = await fetch("/api/auth/signout");
       const data = await res.json();
-      if(data.success === false){
+      if (data.success === false) {
         dispatch(deleteUserFail(data.message));
         return;
       }
@@ -120,20 +116,17 @@ export default function Profile() {
     } catch (error) {
       dispatch(deleteUserFail(data.message));
     }
-  
-  }
+  };
 
   return (
-    <div className="p-3 max-w-lg mx-auto"  
-
-    >
-            <h1
+    <div className="p-3 max-w-lg mx-auto">
+      <h1
         className="text-3xl font-semibold text-center
        my-7"
       >
         Profile
       </h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4" >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           onChange={(e) => setFile(e.target.files[0])}
           type="file"
@@ -186,29 +179,40 @@ export default function Profile() {
           onChange={handleChange}
         />
         <button
+          disabled={loading}
           className="bg-slate-700 text-white rounded-lg p-3
         uppercase hover:opacity-90 disabled:opacity-80"
           type="submit"
         >
           {loading ? "Loading..." : "Update"}
         </button>
+        <Link
+          to="/listing/create"
+          className="text-white bg-green-700 p-3 rounded-lg uppercase text-center hover:opacity-90"
+        >
+          Create listing
+        </Link>
       </form>
       <div className="flex justify-between mt-5">
-        <span onClick={handleDeleteUser}
+        <span
+          onClick={handleDeleteUser}
           className="text-red-700 
         cursor-pointer"
         >
           Delete account
         </span>
-        <span onClick={handleSignOut}
+        <span
+          onClick={handleSignOut}
           className="text-red-700 
         cursor-pointer"
         >
           Sign Out{" "}
         </span>
       </div>
-      
-      <p className='text-green-700'>{updateSuccess ? 'User is updated successfully!' : ''} </p>
+      <p className="text-red-700 mt-5">{error ? error : ""} </p>
+      <p className="text-green-700">
+        {updateSuccess ? "User is updated successfully!" : ""}
+      </p>
     </div>
   );
 }
