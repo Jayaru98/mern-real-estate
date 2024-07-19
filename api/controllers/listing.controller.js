@@ -1,10 +1,11 @@
 import Listing from "../models/listing.model.js";
 
-const createListingHandler = async (req, res) => {
+export const createListingHandler = async (req, res, next) => {
   const {
-    title,
+    name,
     description,
-    price,
+    address,
+    regularPrice,
     discountPrice,
     bathrooms,
     bedrooms,
@@ -14,18 +15,15 @@ const createListingHandler = async (req, res) => {
     offer,
     imageUrls,
     userRef,
-    city,
-    province,
-    country,
-    contact,
-    image,
+  
   } = req.body;
 
   try {
     const listing = Listing.create({
-      title,
+      name,
       description,
-      price,
+      address,
+      regularPrice,
       discountPrice,
       bathrooms,
       bedrooms,
@@ -35,13 +33,7 @@ const createListingHandler = async (req, res) => {
       offer,
       imageUrls,
       userRef,
-      contact,
-      image,
-      location: {
-        city,
-        province,
-        country,
-      },
+    
     });
 
     res.status(201).json(listing);
@@ -50,4 +42,11 @@ const createListingHandler = async (req, res) => {
   }
 };
 
-export { createListingHandler };
+// export const createListingHandler = async (req, res, next) => {
+//   try {
+//     const listing  = await Listing.create(req.body);
+//     return res.status(201).json(listing);
+//   } catch (error) {
+//     next (error);
+//   }
+//   };
