@@ -7,7 +7,7 @@ import {
 } from "firebase/storage";
 import { app } from "../firebase";
 import { useSelector } from "react-redux";
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
@@ -123,12 +123,11 @@ export default function CreateListing() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (formData.imageUrls.length < 1) 
+      if (formData.imageUrls.length < 1)
         return setError("You must upload at least one image");
-      if(+formData.discountPrice > +formData.regularPrice)
+      if (+formData.discountPrice > +formData.regularPrice)
         return setError("Discount price must be less than regular price");
-        
-      
+
       setLoading(true);
       setError(false);
       const res = await fetch("/api/listing/create", {
@@ -146,7 +145,7 @@ export default function CreateListing() {
       if (data.success === false) {
         setError(data.message);
       }
-      navigate(`/listing/${data._id}`)
+      navigate(`/listing/${data._id}`);
     } catch (error) {
       setError(error.message);
       setLoading(false);
@@ -248,7 +247,7 @@ export default function CreateListing() {
               <input
                 type="number"
                 id="bedrooms"
-                mix="1"
+                min="1"
                 max="10"
                 required
                 className="p-3 border border-gray-300 rounded-lg"
@@ -261,7 +260,7 @@ export default function CreateListing() {
               <input
                 type="number"
                 id="bathrooms"
-                mix="1"
+                min="1"
                 max="10"
                 required
                 className="p-3 border-gray-300 rounded-lg"
@@ -274,7 +273,7 @@ export default function CreateListing() {
               <input
                 type="number"
                 id="regularPrice"
-                mix="50"
+                min="50"
                 max="1000000"
                 required
                 className="p-3 border-gray-300 rounded-lg"
@@ -287,23 +286,22 @@ export default function CreateListing() {
               </div>
             </div>
             {formData.offer && (
-              
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                id="discountPrice"
-                min="0"
-                max="1000000"
-                required
-                className="p-3 border-gray-300 rounded-lg"
-                onChange={handleChange}
-                value={formData.discountPrice}
-              />
-              <div className="flex flex-col items-center">
-                <p>Discount price</p>
-                <span className="text-xs"> ($/month) </span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  id="discountPrice"
+                  min="0"
+                  max="1000000"
+                  required
+                  className="p-3 border-gray-300 rounded-lg"
+                  onChange={handleChange}
+                  value={formData.discountPrice}
+                />
+                <div className="flex flex-col items-center">
+                  <p>Discount price</p>
+                  <span className="text-xs"> ($/month) </span>
+                </div>
               </div>
-            </div>
             )}
           </div>
         </div>
@@ -356,7 +354,10 @@ export default function CreateListing() {
                 </button>
               </div>
             ))}
-          <button disabled={loading||uploading} className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-90 disabled:opacity-75">
+          <button
+            disabled={loading || uploading}
+            className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-90 disabled:opacity-75"
+          >
             {loading ? "Loading" : "Create Listing"}
           </button>
           {error && <p className="text-red-700 text-sm">{error}</p>}
