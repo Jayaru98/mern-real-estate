@@ -39,7 +39,7 @@ export default function Listing() {
           return;
         }
         setListing(data);
-        console.log(listing);
+        
         setLoading(false);
         setError(false);
       } catch (error) {
@@ -106,7 +106,7 @@ export default function Listing() {
               </p>
               {listing.offer && (
                 <p className="bg-green-900 w-full max-w-[200px] text-white text-center p-1 rounded-md">
-                  ${+listing.regularPrice - +listing.discountPrice}
+                  ${+listing.regularPrice - +listing.discountPrice} OFF
                 </p>
               )}
             </div>
