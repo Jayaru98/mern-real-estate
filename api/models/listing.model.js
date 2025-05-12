@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+// 
 const listingSchema = new mongoose.Schema(
   {
     name: {
@@ -30,6 +30,37 @@ const listingSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    squareFeet: {
+      type: Number,
+      required: true,
+    },
+    floors: {
+      type: Number,
+      required: true,
+    },
+    kitchens: {
+      type: Number,
+      required: true,
+    },
+    landSize: {
+      type: Number,
+      required: true,
+    },
+    hasPool: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    buildYear: {
+      type: String,
+      enum: ['newer', 'older'],
+      required: true,
+    },
+    propertyType: {
+      type: String,
+      enum: ['residential', 'commercial'],
+      required: true,
+    },
     furnished: {
       type: Boolean,
       required: true,
@@ -53,6 +84,14 @@ const listingSchema = new mongoose.Schema(
     userRef: {
       type: String,
       required: true,
+    },
+    latitude: {
+      type: String,
+      required: false,
+    },
+    longitude: {
+      type: String,
+      required: false,
     },
   },
   { timestamps: true }
