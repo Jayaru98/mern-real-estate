@@ -8,13 +8,15 @@ import {
 import { app } from "../firebase";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import PriceEstimator from '../components/PriceEstimator';
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const params = useParams();
   const [files, setFiles] = useState([]);
-  const [formData, setFormData] = useState({
+  const [showEstimator, setShowEstimator] = useState(false);
+  const [usedEstimator, setUsedEstimator] = useState(false);  const [formData, setFormData] = useState({
     imageUrls: [],
     name: "",
     description: "",
@@ -29,6 +31,8 @@ export default function CreateListing() {
     landSize: 0,
     hasPool: false,
     buildYear: "older",
+    year: 2010,  // Added for ML API
+    pool: false, // Added for ML API
     regularPrice: 50,
     discountPrice: 0,
     offer: false,
@@ -120,17 +124,26 @@ export default function CreateListing() {
         ...formData,
         type: e.target.id,
       });
-    }
-    if (
+    }    if (
       e.target.id === "parking" ||
       e.target.id === "furnished" ||
       e.target.id === "offer" ||
       e.target.id === "hasPool"
     ) {
-      setFormData({
+      // Update both the original property and the ML API mapped property
+      const updates = {
         ...formData,
         [e.target.id]: e.target.checked,
-      });
+      };
+      
+      // If hasPool is changed, also update the pool field for ML API
+      if (e.target.id === "hasPool") {
+        updates.pool = e.target.checked;
+      }
+      
+      // If furnished is changed, it's already named correctly for ML API
+      
+      setFormData(updates);
     }
     if (
       e.target.type === "number" ||
@@ -314,7 +327,8 @@ export default function CreateListing() {
                         if (e.target.checked) {
                           setFormData({
                             ...formData,
-                            buildYear: "newer"
+                            buildYear: "newer",
+                            year: 2020  // For ML API - newer buildings assumed to be around 2020
                           });
                         }
                       }}
@@ -331,7 +345,8 @@ export default function CreateListing() {
                         if (e.target.checked) {
                           setFormData({
                             ...formData,
-                            buildYear: "older"
+                            buildYear: "older",
+                            year: 2010  // For ML API - older buildings assumed to be around 2010
                           });
                         }
                       }}
@@ -470,6 +485,36 @@ export default function CreateListing() {
               </div>
             </div>
           
+            {/* AI Price Estimation Section */}
+            <div className="bg-slate-50 p-4 rounded-md mb-6">
+              <h2 className="text-xl font-semibold text-slate-700 border-b pb-2 mb-4">
+                Price Estimation
+              </h2>
+              <p className="text-sm text-gray-600 mb-4">
+                Get an AI-powered price estimate based on your property details
+              </p>
+              <button 
+                type="button"
+                onClick={() => setShowEstimator(!showEstimator)}
+                className="mb-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
+              >
+                {showEstimator ? 'Hide Price Estimator' : 'Show Price Estimator'}
+              </button>
+              
+              {showEstimator && (
+                <PriceEstimator 
+                  formData={formData} 
+                  onEstimatedPriceChange={(price) => {
+                    setFormData({
+                      ...formData,
+                      regularPrice: Math.round(price)
+                    });
+                    setUsedEstimator(true);
+                  }} 
+                />
+              )}
+            </div>
+            
             {/* Pricing Section */}
             <div className="bg-slate-50 p-4 rounded-md">
               <h2 className="text-xl font-semibold text-slate-700 border-b pb-2 mb-4">
