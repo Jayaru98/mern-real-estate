@@ -38,6 +38,7 @@ jobs:
           script: |
             pm2 delete backend-prod-app || true
             pm2 save
+            sleep 15
             sudo rm -rf /opt/sri-state/api/*
             sudo rm -rf /opt/sri-state/api/*.
             ####
