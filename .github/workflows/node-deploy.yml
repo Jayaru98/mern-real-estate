@@ -1,0 +1,64 @@
+name: Prod-V2 - Manually Build and Deploy to Prod Amazon Lightsail
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-deploy-frontend:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies and build
+        working-directory: ./api
+        
+        env:
+          MONGO: ${{ secrets.MONGO_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          echo "MONGO=$MONGO" >> .env
+          echo "JWT_SECRET=$JWT_SECRET" >> .env
+          npm install
+          npm run build
+
+      - name: List build output
+        run: ls -alh
+
+      - name: SSH into Lightsail and stop existing PM2 process
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_IP_FE_PROD }}
+          username: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_USERNAME_FE_PROD }}
+          key: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_PRIVATE_KEY_FE_PROD }}
+          port: 22
+          script: |
+            pm2 delete backend-prod-app || true
+            pm2 save
+
+      - name: Copy files to Amazon Lightsail
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_IP_FE_PROD }}
+          username: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_USERNAME_FE_PROD }}
+          key: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_PRIVATE_KEY_FE_PROD }}
+          port: 22
+          source: "api/*"
+          target: "/opt/sri-state"
+
+      - name: SSH and start PM2 on Lightsail
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_IP_FE_PROD }}
+          username: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_USERNAME_FE_PROD }}
+          key: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_PRIVATE_KEY_FE_PROD }}
+          port: 22
+          script: |
+            cd /opt/sri-state
+            npm install -g pm2
+            pm2 start npm --name "frontend-prod-app" -- start
+            pm2 save
