@@ -18,7 +18,7 @@ jobs:
         working-directory: ./api
         
         env:
-          MONGO: ${{ secrets.MONGO_URI }}
+          MONGO: ${{ secrets.MONGO }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
           echo "MONGO=$MONGO" >> .env
