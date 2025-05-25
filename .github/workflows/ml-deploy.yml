@@ -43,7 +43,7 @@ jobs:
           key: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_PRIVATE_KEY_FE_PROD }}
           port: 22
           source: "ML-api/*"
-          target: "/opt/sri-state/ML-api"
+          target: "/opt/sri-state/"
 
       - name: SSH and start Python app with PM2
         uses: appleboy/ssh-action@master
