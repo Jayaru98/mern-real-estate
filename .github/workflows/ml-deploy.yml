@@ -1,0 +1,61 @@
+name: Prod-V2 - Manually Build and Deploy to Prod Amazon Lightsail
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-deploy-python:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Python and dependencies
+        working-directory: ./ML-api
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: List build output
+        run: ls -alh ./ML-api
+
+      - name: SSH into Lightsail and stop existing PM2 process
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_IP_FE_PROD }}
+          username: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_USERNAME_FE_PROD }}
+          key: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_PRIVATE_KEY_FE_PROD }}
+          port: 22
+          script: |
+            pm2 delete ml-python-prod-app || true
+            pm2 save
+            sleep 5
+            sudo rm -rf /opt/sri-state/ML-api/* || true
+            sudo rm -rf /opt/sri-state/ML-api/.* 2>/dev/null || true
+
+      - name: Copy files to Amazon Lightsail
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_IP_FE_PROD }}
+          username: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_USERNAME_FE_PROD }}
+          key: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_PRIVATE_KEY_FE_PROD }}
+          port: 22
+          source: "ML-api/*"
+          target: "/opt/sri-state/ML-api"
+
+      - name: SSH and start Python app with PM2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_IP_FE_PROD }}
+          username: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_USERNAME_FE_PROD }}
+          key: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_PRIVATE_KEY_FE_PROD }}
+          port: 22
+          script: |
+            cd /opt/sri-state/ML-api
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install -r requirements.txt
+            pm2 start venv/bin/python --name "ml-python-prod-app" -- app.py
+            pm2 save
