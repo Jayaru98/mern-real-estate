@@ -24,11 +24,6 @@ jobs:
           echo "MONGO=$MONGO" >> .env
           echo "JWT_SECRET=$JWT_SECRET" >> .env
           npm install
-<<<<<<< HEAD
-         
-=======
-          npm  build
->>>>>>> 6aa54ec557f306bd3120f12a981d2d6ce552ce24
 
       - name: List build output
         run: ls -alh
