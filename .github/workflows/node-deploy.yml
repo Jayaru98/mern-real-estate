@@ -65,5 +65,5 @@ jobs:
           script: |
             cd /opt/sri-state/api
             npm install -g pm2
-            pm2 start npm --name "frontend-prod-app" -- start
+            pm2 start npm --name "backend-prod-app" -- start
             pm2 save
