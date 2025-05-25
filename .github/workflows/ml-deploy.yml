@@ -1,4 +1,4 @@
-name: Prod-V2 - Manually Build and Deploy to Prod Amazon Lightsail
+name: node application deploy
 
 on:
   workflow_dispatch:
