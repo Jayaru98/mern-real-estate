@@ -38,6 +38,9 @@ jobs:
           script: |
             pm2 delete backend-prod-app || true
             pm2 save
+            sudo rm -rf /opt/sri-state/api/*
+            sudo rm -rf /opt/sri-state/api/*.
+            ####
 
       - name: Copy files to Amazon Lightsail
         uses: appleboy/scp-action@master
