@@ -57,7 +57,7 @@ jobs:
           key: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_PRIVATE_KEY_FE_PROD }}
           port: 22
           script: |
-            cd /opt/sri-state
+            cd /opt/sri-state/api
             npm install -g pm2
             pm2 start npm --name "frontend-prod-app" -- start
             pm2 save
