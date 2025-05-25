@@ -41,6 +41,8 @@ jobs:
             sleep 15
             sudo rm -rf /opt/sri-state/api/*
             sudo rm -rf /opt/sri-state/api/*.
+            mkdir /opt/sri-state/api
+            sleep 10
             ####
 
       - name: Copy files to Amazon Lightsail
