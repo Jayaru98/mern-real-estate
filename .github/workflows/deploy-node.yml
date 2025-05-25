@@ -16,7 +16,13 @@ jobs:
 
       - name: Install dependencies and build
         working-directory: ./api
+        
+        env:
+          MONGO: ${{ secrets.MONGO_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
+          echo "MONGO=$MONGO" >> .env
+          echo "JWT_SECRET=$JWT_SECRET" >> .env
           npm install
           npm run build
 
