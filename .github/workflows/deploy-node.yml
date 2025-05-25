@@ -14,9 +14,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-
       - name: Install dependencies and build
-	    working-directory: ./api
+        working-directory: ./api
         run: |
           npm install
           npm run build
@@ -42,7 +41,7 @@ jobs:
           username: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_USERNAME_FE_PROD }}
           key: ${{ secrets.AMAZON_LIGHTSAIL_INSTANCE_PRIVATE_KEY_FE_PROD }}
           port: 22
-          source: "."
+          source: "api/*"
           target: "/opt/sri-state"
 
       - name: SSH and start PM2 on Lightsail
@@ -55,6 +54,5 @@ jobs:
           script: |
             cd /opt/sri-state
             npm install -g pm2
-			pm2 start npm --name "frontend-prod-app" -- start
-			pm2 save
-
+            pm2 start npm --name "frontend-prod-app" -- start
+            pm2 save
