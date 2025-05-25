@@ -1,4 +1,4 @@
-name: node application deploy
+name: ML application deploy
 
 on:
   workflow_dispatch:
